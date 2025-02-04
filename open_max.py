@@ -125,7 +125,7 @@ def get_mav(model, data_loader):
                 mean_activation_vector = torch.mean(penultimate_activations, dim=0)
 
                 # Compute distances
-                distances = compute_distances(mean_activation_vector.detach().numpy(), penultimate_activations.detach().numpy())
+                distances = compute_distances(mean_activation_vector.cpu().detach().numpy(), penultimate_activations.cpu().detach().numpy())
 
                 # Update MAV and distances for the label
                 if label in mean_activation_vectors:

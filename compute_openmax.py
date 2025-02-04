@@ -86,7 +86,7 @@ def recalibrate_scores(weibull_model, labellist, penultimate_activations, alphar
     for categoryid in range(len(labellist)):
         # get distance from mean vector
         category_weibull = query_weibull(labellist[categoryid], weibull_model)
-        distance = compute_distance(penultimate_activations.detach().numpy(), category_weibull[0].detach().numpy())
+        distance = compute_distance(penultimate_activations.cpu().detach().numpy(), category_weibull[0].cpu().detach().numpy())
 
         wscore = category_weibull[2][0].w_score(distance)  # category_weibull = [mean_vec, distances, weibull_model]
 

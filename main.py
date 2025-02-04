@@ -58,6 +58,7 @@ data_transform = transforms.Compose([
 # train and validation datasets
 train_dataset = PathMNIST(split='train', download=False, transform=data_transform)
 val_dataset = PathMNIST(split='val', download=False, transform=data_transform)
+test_dataset = PathMNIST(split='test', download=False, transform=data_transform)
 
 # unknown dataset - DermaMNIST because it has the same input dimensions and channels as original dataset
 unknown_dataset = DermaMNIST('test', download=True, transform=data_transform)
@@ -68,10 +69,36 @@ mav, distances = get_mav(model, train_loader)
 
 # load validation and unknown datasets to compare softmax and openmax
 val_loader = DataLoader(val_dataset, batch_size=4096, shuffle=False)
+test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
 unknown_dataloader = DataLoader(unknown_dataset, batch_size=4096, shuffle=False)
 
 x_val, y_val = next(iter(val_loader))
 x_unknown, y_unknown = next(iter(unknown_dataloader))
+
+
+def accuracy(model, test_loader, mav, distances):
+    with torch.no_grad():
+        model.eval()
+        correct = 0
+        total = 0
+
+        for images, labels in test_loader:
+            images = images
+            labels = labels.view(-1)
+            outputs = model(images)
+
+            openmax, _ = compute_openmax(mav, distances, outputs)
+
+            predicted = torch.argmax(openmax)
+            total += labels.size(0)
+            correct += torch.eq(predicted, labels).sum().item()
+
+        acc = correct / total
+
+    return acc
+
+
+print(f'Accuracy: {accuracy(model, test_loader, mav, distances) * 100:.2f}%')
 
 # compare on data from same distribution as training data
 for _ in range(10):
