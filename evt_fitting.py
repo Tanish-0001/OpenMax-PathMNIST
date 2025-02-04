@@ -21,8 +21,8 @@ def weibull_tailfitting(mav, distances, tailsize=25):
 
     mr = libmr.MR()
 
-    tailtofit = sorted(distances)[-tailsize:]  # take the biggest n distances
-    mr.fit_high(tailtofit, len(tailtofit))
+    tailtofit = sorted(distances)[-tailsize:]  # take the biggest 'tailsize' distances
+    mr.fit_high(tailtofit, len(tailtofit))  # fit weibull curve
     weibull_model['weibull_model'] = [mr]
 
     return weibull_model
