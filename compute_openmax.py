@@ -47,9 +47,6 @@ def computeOpenMaxProbability(openmax_penultimate, openmax_score_u):
     return modified_scores
 
 
-# ---------------------------------------------------------------------------------
-
-
 def recalibrate_scores(weibull_model, labellist, penultimate_activations, alpharank=6):
     """
     Given activation features for an image and list of weibull models for each class,
