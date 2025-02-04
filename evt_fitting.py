@@ -1,40 +1,49 @@
-import numpy as np
-from scipy.stats import weibull_min
+import libmr
 
 
-def weibull_tailfitting(mav, distances, tailsize):
-
-    """ Read through distance files, mean vector and fit weibull model
-    for each category
+def weibull_tailfitting(mav, distances, tailsize=25):
+    """
+    Read through distance files, mean vector and fits weibull model for each category
 
     Input:
     --------------------------------
-    meanfiles_path : contains path to files with pre-computed mean-activation
-     vector
-    distancefiles_path : contains path to files with pre-computed distances
-     for images from MAV
-    labellist : ImageNet 2012 labellist
+    mav : the mean activation vector for a particular label
+    distances : corresponding distances for that label
+    tailsize : the tailsize to which weibull model is fit
 
     Output:
     --------------------------------
-    weibull_model : Perform EVT based analysis using tails of distances and
-    save weibull model parameters for re-adjusting softmax scores
+    weibull_model : Perform EVT based analysis using tails of distances and save weibull model
+    parameters for re-adjusting softmax scores
     """
-    distance = np.array(distances)
 
-    # Sort distances and take the largest tailsize values
-    tail_to_fit = np.sort(distance)[::-1]
+    weibull_model = {'distances': distances, 'mean_vec': mav, 'weibull_model': []}
 
-    shape, loc, scale = weibull_min.fit(tail_to_fit, floc=0)
+    mr = libmr.MR()
 
-    weibull_model = {
-        'mean_vec': mav,
-        'weibull_params': {
-            'shape': shape,
-            'loc': loc,
-            'scale': scale
-        }
-    }
+    tailtofit = sorted(distances)[-tailsize:]  # take the biggest n distances
+    mr.fit_high(tailtofit, len(tailtofit))
+    weibull_model['weibull_model'] = [mr]
 
     return weibull_model
 
+
+def query_weibull(category_name, weibull_model):
+    """
+    Query through dictionary for Weibull model.
+
+    Input:
+    ------------------------------
+    category_name : name/id of category to query
+    weibull_model: dictionary of weibull models
+
+    Output:
+    ------------------------------
+    category_weibull : [mean_vec, distances, weibull_model]
+    """
+
+    category_weibull = [weibull_model[category_name]['mean_vec'],
+                        weibull_model[category_name]['distances'],
+                        weibull_model[category_name]['weibull_model']]
+
+    return category_weibull
