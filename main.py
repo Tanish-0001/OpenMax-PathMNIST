@@ -70,20 +70,19 @@ mav, distances = get_mav(model, train_loader)
 # load validation and unknown datasets to compare softmax and openmax
 val_loader = DataLoader(val_dataset, batch_size=4096, shuffle=False)
 test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
-unknown_dataloader = DataLoader(unknown_dataset, batch_size=4096, shuffle=False)
+unknown_dataloader = DataLoader(unknown_dataset, batch_size=1, shuffle=False)
 
 x_val, y_val = next(iter(val_loader))
 x_unknown, y_unknown = next(iter(unknown_dataloader))
 
 
-def accuracy(model, test_loader, mav, distances):
+def accuracy_known(model, test_loader, mav, distances):
     with torch.no_grad():
         model.eval()
         correct = 0
         total = 0
 
         for images, labels in test_loader:
-            images = images
             labels = labels.view(-1)
             outputs = model(images)
 
@@ -98,7 +97,30 @@ def accuracy(model, test_loader, mav, distances):
     return acc
 
 
-print(f'Accuracy: {accuracy(model, test_loader, mav, distances) * 100:.2f}%')
+def accuracy_unknown(model, unknown_loader, mav, distances):
+    with torch.no_grad():
+        model.eval()
+        correct = 0
+        total = 0
+
+        for images, labels in unknown_loader:
+            outputs = model(images)
+
+            openmax, _ = compute_openmax(mav, distances, outputs)
+
+            predicted = torch.argmax(openmax)
+            actual = torch.full(predicted.size(), 9, dtype=torch.long, device=predicted.device)
+
+            total += labels.size(0)
+            correct += torch.eq(predicted, actual).sum().item()
+
+        acc = correct / total
+
+    return acc
+
+
+print(f'Known Accuracy: {accuracy_known(model, test_loader, mav, distances) * 100:.2f}%')
+print(f'Unknown Accuracy: {accuracy_unknown(model, unknown_dataloader, mav, distances) * 100:.2f}%')
 
 # compare on data from same distribution as training data
 for _ in range(10):
