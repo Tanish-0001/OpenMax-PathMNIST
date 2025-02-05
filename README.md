@@ -1,5 +1,5 @@
 # OpenMax-PathMNIST
-Implementation of the OpenMax layer in a deep network as described in the paper "Towards Open Set Deep Networks" presented at CVPR 2016 (https://arxiv.org/abs/1511.06233). Openmax is an alternative to the softmax layer used in ANNs for classification tasks. Openmax is designed for open datasets where we want the model to not misclassify unknown data into one of the labels it was trained on. Instead, we want it to simply return UNKNOWN in such cases.
+Implementation of the OpenMax layer in a deep network as described in the paper "Towards Open Set Deep Networks" presented at CVPR 2016 (https://arxiv.org/abs/1511.06233). Openmax is an alternative to the softmax layer used in deep networks for classification tasks. Openmax is designed for open datasets where we don't want the model to misclassify unknown data into one of the labels it was trained on. Instead, we want it to simply return UNKNOWN.
 
 Dataset used for the task is PathMNIST (Medical images from Colon Pathology) for training and DermaMNIST (images from a Dermatoscope) as the unknown dataset. Both datasets are from the MedMNIST collection of biomedical images.
 
