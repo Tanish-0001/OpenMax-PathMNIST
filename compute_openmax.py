@@ -67,7 +67,7 @@ def recalibrate_scores(weibull_model, labellist, penultimate_activations, alphar
 
     """
 
-    scores = softmax(penultimate_activations, dim=0)  # get base scores after applying softmax
+    scores = softmax(penultimate_activations, dim=1)  # get base scores after applying softmax
     penultimate_activations = penultimate_activations.squeeze()
 
     ranked_list = scores.argsort(descending=True).ravel()
@@ -101,6 +101,4 @@ def recalibrate_scores(weibull_model, labellist, penultimate_activations, alphar
     # get openmax probability
     openmax_probab = computeOpenMaxProbability(openmax_penultimate, openmax_score_u)
 
-    softmax_probab = scores.ravel()
-
-    return openmax_probab, softmax_probab
+    return openmax_probab, scores
